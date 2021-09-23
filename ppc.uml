@@ -1,0 +1,82 @@
+@startuml ppc
+class Propagator{
+    List variables
+    List constraints
+    Stack<List<Pair<SetVariable, int[]>>> stack_changes_variables
+    {static} Propagator getPropagator()
+    void addConstraint()
+    void addVariable()
+    void filter()
+}
+class SetVariable{
+    set<int> lower_bound
+    set<int> upper_bound
+    set<int> default_lower_bound
+    set<int> default_upper_bound
+    bool remove_from_upper()
+    bool remove_from_lower()
+    bool add_to_upper()
+    bool add_to_lower()
+}
+interface Constraint{
+    bool entailment()
+    bool failure()
+    list<SetVariable> filter()
+}
+class IncludeConstraint{
+    F <U+2282> G
+    __
+    SetVariable F
+    SetVariable G
+}
+class BelongConstraint{
+    x <U+2208> F
+    __
+    int i
+    SetVariable F
+}
+class CardinalConstraint{
+    |F| = i
+    __
+    int i
+    SetVariable F
+}
+class IntersectConstraint{
+    H = F <U+2229> G
+    __
+    SetVariable F
+    SetVariable G
+    SetVariable H
+}
+class UnionConstraint{
+    H = F <U+222A> G
+    __
+    SetVariable F
+    SetVariable G
+    SetVariable H
+}
+class DiffConstraint{
+    H = F <U+2216> G
+    __
+    SetVariable F
+    SetVariable G
+    SetVariable H
+}
+
+IncludeConstraint "*" --* "2" SetVariable
+BelongConstraint "*" --* "1" SetVariable
+CardinalConstraint "*" --* "1" SetVariable
+IntersectConstraint "*" --* "3" SetVariable
+UnionConstraint "*" --* "3" SetVariable
+DiffConstraint "*" --* "3" SetVariable
+
+Constraint --|> IncludeConstraint
+Constraint --|> BelongConstraint
+Constraint --|> CardinalConstraint
+Constraint --|> IntersectConstraint
+Constraint --|> UnionConstraint
+Constraint --|> DiffConstraint
+
+Propagator "1" --* "*" Constraint
+Propagator "1" --* "*" SetVariable
+@enduml
