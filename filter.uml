@@ -1,0 +1,43 @@
+@startuml filter_sequence
+actor Jules
+participant Propagator
+queue woke_up_constraints
+
+participant constraint
+participant var
+
+Jules -> Propagator : Filter(startingVar)
+Propagator -> Propagator : list_constraints = getConstraintsWithVar(startingVar)
+Propagator -> woke_up_constraints : addItems(list_constraints)
+loop woke_up_constraints is not empty
+    Propagator -> woke_up_constraints : pop()
+    return constraint
+    Propagator -> constraint : filter()
+    return map_var_values_to_filter
+    note right
+        variable de type Map<SetVariable, List<Integer>>
+        Comment différencier les ajouts à la borne inf
+        des suppressions de la borne sup ?
+    end note
+    group for [var in map_var_values_to_filter.keys()]
+        Propagator -> Propagator : list_constraints = []
+        Propagator -> woke_up_constraints : addItems(list_constraints)
+        note right
+            ne pas toutes les prendre
+            éviter celles déjà dans la pile et <i>constraint</i>.
+        end note
+        group for val in map_var_values_to_filter.at(var)
+            Propagator -> var : remove/add_value(val)
+            return failure_variable
+            note right
+                Cette variable booleene désigne si la variable
+                ne peut être affecté à un ensemble.
+            end note
+            alt failure_variable
+                Propagator -> Propagator : EXIT & backtrack()
+            end
+
+        end
+    end
+end
+@enduml
