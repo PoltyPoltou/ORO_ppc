@@ -1,3 +1,5 @@
+![baniere_golf](https://user-images.githubusercontent.com/40352310/134727987-ff2504c5-feeb-4bfe-b85a-a9e0d6c45d8f.png)
+
 # Set Constraint Solver for the Social Golfer Problem (SGP)
 
 This project is part of the Advanced Constraint Programming course at Nantes University (Master 2 Optimization and Operational Research - 2021 - 2022).
