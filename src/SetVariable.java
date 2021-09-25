@@ -101,8 +101,7 @@ public class SetVariable {
 	 *         false otherwise
 	 */
 	public boolean remove_from_lower(int variable) {
-		// TODO ...
-		return false;
+		return this.lower_bound.remove(variable);
 	}
 
 	/**
@@ -114,8 +113,7 @@ public class SetVariable {
 	 *         false otherwise
 	 */
 	public boolean remove_from_upper(int variable) {
-		// TODO ...
-		return false;
+		return this.upper_bound.remove(variable);
 	}
 
 	/**
@@ -127,8 +125,7 @@ public class SetVariable {
 	 *         otherwise
 	 */
 	public boolean add_to_lower(int variable) {
-		// TODO ...
-		return false;
+		return this.lower_bound.add(variable);
 	}
 
 	/**
@@ -140,8 +137,7 @@ public class SetVariable {
 	 *         otherwise
 	 */
 	public boolean add_to_upper(int variable) {
-		// TODO ...
-		return false;
+		return this.upper_bound.add(variable);
 	}
 
 	/**
@@ -188,6 +184,23 @@ public class SetVariable {
 			max_cardinality += delta;
 			return true;
 		}
+	}
+
+	public boolean is_valid() {
+		if (this.max_cardinality < this.lower_bound.size()) {
+			return false;
+		}
+		if (this.min_cardinality < this.upper_bound.size()) {
+			return false;
+		}
+		if (this.max_cardinality < this.min_cardinality) {
+			return false;
+		}
+		// Costly operation O(n*ln(n))
+		if (this.upper_bound.containsAll(this.lower_bound)) {
+			return false;
+		}
+		return true;
 	}
 
 }
