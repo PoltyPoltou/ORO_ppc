@@ -26,11 +26,12 @@ class SetVariable{
     bool remove_from_lower()
     bool add_to_upper()
     bool add_to_lower()
+    bool is_valid()
 }
 interface Constraint{
     bool entailment()
     bool failure()
-    list<SetVariable> filter()
+    Map<SetVariable, list<Integer>> filter()
 }
 class IncludeConstraint{
     F <U+2282> G
