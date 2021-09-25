@@ -7,6 +7,7 @@ participant constraint
 participant var
 
 Jules -> Propagator : Filter(startingVar)
+Propagator -> Propagator : list_var_value_filtered = []
 Propagator -> Propagator : list_constraints = getConstraintsWithVar(startingVar)
 Propagator -> woke_up_constraints : addItems(list_constraints)
 loop woke_up_constraints is not empty
@@ -26,7 +27,8 @@ loop woke_up_constraints is not empty
             ne pas toutes les prendre
             éviter celles déjà dans la pile et <i>constraint</i>.
         end note
-        group for val in map_var_values_to_filter.at(var)
+        group for [val in map_var_values_to_filter.at(var)]
+            Propagator -> Propagator : list_var_value_filtered.add((var,val))
             Propagator -> var : remove/add_value(val)
             return failure_variable
             note right
@@ -34,10 +36,12 @@ loop woke_up_constraints is not empty
                 ne peut être affecté à un ensemble.
             end note
             alt failure_variable
+                Propagator -> Propagator : stack_changes_variables.add(list_var_value_filtered)
                 Propagator -> Propagator : EXIT & backtrack()
             end
 
         end
     end
 end
+Propagator -> Propagator : stack_changes_variables.add(list_var_value_filtered)
 @enduml

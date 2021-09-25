@@ -7,7 +7,16 @@ class Propagator{
     void addConstraint()
     void addVariable()
     void filter()
+    void backtrack()
 }
+
+note right
+    stack_changes_variables est une pile de liste
+    chaque liste contient tous les couples variables valeurs qui ont été enlevé/ajoutés
+    à chaque énumération on ajoute une liste sur la pile
+    à chaque backtrack on retire une liste de la pile
+end note
+
 class SetVariable{
     set<int> lower_bound
     set<int> upper_bound
@@ -70,12 +79,12 @@ IntersectConstraint "*" --* "3" SetVariable
 UnionConstraint "*" --* "3" SetVariable
 DiffConstraint "*" --* "3" SetVariable
 
-Constraint --|> IncludeConstraint
-Constraint --|> BelongConstraint
-Constraint --|> CardinalConstraint
-Constraint --|> IntersectConstraint
-Constraint --|> UnionConstraint
-Constraint --|> DiffConstraint
+Constraint <|-- IncludeConstraint
+Constraint <|-- BelongConstraint
+Constraint <|-- CardinalConstraint
+Constraint <|-- IntersectConstraint
+Constraint <|-- UnionConstraint
+Constraint <|-- DiffConstraint
 
 Propagator "1" --* "*" Constraint
 Propagator "1" --* "*" SetVariable
