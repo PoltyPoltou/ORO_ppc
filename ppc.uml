@@ -2,19 +2,24 @@
 class Propagator{
     List variables
     List constraints
-    Stack<List<Pair<SetVariable, int[]>>> stack_changes_variables
+    Stack<List<Pair<SetVariable, int>>> stack_variables_set_addition
+    Stack<List<Pair<SetVariable, int>>> stack_variables_set_removal
+    Stack<List<Pair<SetVariable, Pair<int,int>>>> stack_variables_cardinality_changes
     {static} Propagator getPropagator()
     void addConstraint()
     void addVariable()
-    void filter()
+    bool filter()
     void backtrack()
 }
 
 note right
-    stack_changes_variables est une pile de liste
-    chaque liste contient tous les couples variables valeurs qui ont été enlevé/ajoutés
+    stack_variables_set_addition(removal) est une pile de liste
+    chaque liste contient tous les couples variables valeurs
+    qui ont été ajoutés (enlevés) à la borne inf (sup)
     à chaque énumération on ajoute une liste sur la pile
     à chaque backtrack on retire une liste de la pile
+    stack_variables_cardinality_changes stockent les
+    valeurs de cardinalités changés
 end note
 
 class SetVariable{
@@ -29,9 +34,10 @@ class SetVariable{
     bool is_valid()
 }
 interface Constraint{
+    Collection<SetVariable> get_variables()
     bool entailment()
     bool failure()
-    Map<SetVariable, list<Integer>> filter()
+    void filter(List<SetVariables>, List<Pair<int,int>, List<int>, List<int>)
 }
 class IncludeConstraint{
     F <U+2282> G
