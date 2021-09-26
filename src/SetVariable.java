@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
+ * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
  */
 
@@ -14,6 +14,7 @@
  *
  * The functions increase and decrease cardinality are not finished. They maybe need to check
  * more preconditions (min <= max, ...)
+ * is_valid will check if the variable cannot take any value
  */
 
 import java.util.TreeSet;
@@ -201,6 +202,22 @@ public class SetVariable {
 			return false;
 		}
 		return true;
+	}
+
+	public int get_min_cardinality() {
+		return min_cardinality;
+	}
+
+	public void set_min_cardinality(int min_cardinality) {
+		this.min_cardinality = min_cardinality;
+	}
+
+	public int get_max_cardinality() {
+		return max_cardinality;
+	}
+
+	public void set_max_cardinality(int max_cardinality) {
+		this.max_cardinality = max_cardinality;
 	}
 
 }
