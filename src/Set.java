@@ -45,11 +45,11 @@ public interface Set {
     /**
      * @return Remove from @this the elements contained by the given set
      */
-    public void deprivedOf(Set set);
+    public void deprived_of(Set set);
 
     /**
      * @return Returns the list of values in the set
      */
     public List<Integer> get_values();
-    
+
 }
