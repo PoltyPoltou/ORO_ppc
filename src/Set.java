@@ -1,4 +1,11 @@
+/*
+ * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
+ *
+ */
 
+/**
+ * Interface for all set Sets
+ */
 public interface Set {
 
     /**
@@ -44,4 +51,5 @@ public interface Set {
      * @return Returns the list of values in the set
      */
     public List<Integer> get_values();
+    
 }
