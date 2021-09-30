@@ -30,20 +30,31 @@ public interface Set {
      * @return True if @this is the same as the given set,
      *         false otherwise
      */
-    public boolean different(Set set);
+    public boolean equals(Set set);
 
     /**
-     * @return Remove from @this the elements not contained by the given set
+     * @return True if @this has no elements,
+     *         false otherwise
+     */
+    public boolean is_empty();
+
+    /**
+     * Remove all elements in the set
+     */
+    public void clear();
+
+    /**
+     * Remove from @this the elements not contained by the given set
      */
     public void inter(Set set);
 
     /**
-     * @return Add to @this the elements contained by the given set
+     * Add to @this the elements contained by the given set
      */
     public void union(Set set);
 
     /**
-     * @return Remove from @this the elements contained by the given set
+     * Remove from @this the elements contained by the given set
      */
     public void deprived_of(Set set);
 
