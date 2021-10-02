@@ -1,5 +1,3 @@
-import java.util.List;
-
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
@@ -11,28 +9,32 @@ import java.util.List;
 public interface Set {
 
     /**
-     * @return True if the given integer has been added to the set, false otherwise
+     * @return True if the given integer has been added to the set,
+     *         false otherwise
      */
     public boolean add(int value);
 
     /**
-     * @return True if the given integer has been removed to the set, false
-     *         otherwise
+     * @return True if the given integer has been removed to the set,
+     *         false otherwise
      */
     public boolean remove(int value);
 
     /**
-     * @return True if the given integer is contained by the set, false otherwise
+     * @return True if the given integer is contained by the set,
+     *         false otherwise
      */
     public boolean contains(int value);
 
     /**
-     * @return True if @this is the same as the given set, false otherwise
+     * @return True if @this is the same as the given set,
+     *         false otherwise
      */
     public boolean equals(Set set);
 
     /**
-     * @return True if @this has no elements, false otherwise
+     * @return True if @this has no elements,
+     *         false otherwise
      */
     public boolean is_empty();
 
@@ -55,6 +57,11 @@ public interface Set {
      * Remove from @this the elements contained by the given set
      */
     public void deprived_of(Set set);
+
+    /**
+     * @return Returns the list of intervals of the set (for intervalSets only)
+     */
+    public List<Interval> get_intervals();
 
     /**
      * @return Returns the list of values in the set
