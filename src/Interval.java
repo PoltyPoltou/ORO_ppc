@@ -19,7 +19,7 @@ public class Interval {
      */
     public Interval(int bottom, int top) {
         if (bottom > top) {
-            throw IllegalArgumentException("\n$ bottom can't be strictly greater than top.");
+            throw new IllegalArgumentException("\n$ bottom can't be strictly greater than top.");
         }
         this.bottom = bottom;
         this.top = top;
