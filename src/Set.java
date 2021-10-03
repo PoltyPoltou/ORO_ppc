@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
@@ -61,11 +63,11 @@ public interface Set {
     /**
      * @return Returns the list of intervals of the set (for intervalSets only)
      */
-    public List<Interval> get_intervals();
+    public LinkedList<Interval> get_intervals();
 
     /**
      * @return Returns the list of values in the set
      */
-    public List<Integer> get_values();
+    public LinkedList<Integer> get_values();
 
 }
