@@ -1,3 +1,8 @@
+/*
+* Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
+*
+*/
+
 public class Pair<T, U> {
     private T first;
     private U second;
