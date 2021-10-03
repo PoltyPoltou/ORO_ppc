@@ -27,6 +27,10 @@ public class IntervalSet implements Set {
         this.intervals.add(interval);
     }
     
+    public IntervalSet(LinkedList<Interval> intervals) {
+        this.intervals = intervals;
+    }
+    
     public void enableVerbose() {
     	verbose = true;
     }
@@ -36,11 +40,15 @@ public class IntervalSet implements Set {
     }
     
     public void printIntervals() {
-    	System.out.print("(");
-    	for(int i = first(); i < last(); i++) {
-    		System.out.print(intervals.get(i).toString()+" U ");
+    	if (!this.is_empty()) {
+    		System.out.print("(");
+        	for(int i = first(); i < last(); i++) {
+        		System.out.print(intervals.get(i).toString()+" U ");
+        	}
+        	System.out.println(intervals.get(last()).toString()+")");
+    	} else {
+    		System.out.println("()");
     	}
-    	System.out.println(intervals.get(last()).toString()+")");
     }
 
     /**************
@@ -424,8 +432,14 @@ public class IntervalSet implements Set {
      *         false otherwise
      */
     public boolean contains(int value) {
-    	// TODO
-    	return true;
+    	
+    	if (verbose) {
+    		System.out.println("contains("+value+")");
+    	}
+    	
+    	Interval indicator = indicies_intervals_containing(value);
+
+        return value_inside_interval(indicator);
     }
     
     /**
@@ -433,8 +447,12 @@ public class IntervalSet implements Set {
      *         false otherwise
      */
     public boolean equals(Set set) {
-    	// TODO
-    	return true;
+    	
+    	if (verbose) {
+    		System.out.println("equals("+set.toString()+")");
+    	}
+    	
+    	return intervals.equals(set.get_intervals());
     }
     
     /**
@@ -442,15 +460,24 @@ public class IntervalSet implements Set {
      *         false otherwise
      */
     public boolean is_empty() {
-    	// TODO
-    	return true;
+    	
+    	if (verbose) {
+    		System.out.println("is_empty()");
+    	}
+    	
+    	return intervals.isEmpty();
     }
 
     /**
      * Remove all elements in the set
      */
     public void clear() {
-    	// TODO
+    	
+    	if (verbose) {
+    		System.out.println("clear()");
+    	}
+    	
+    	intervals.clear();
     }
 
     /**
