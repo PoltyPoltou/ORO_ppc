@@ -14,6 +14,11 @@ public class IntervalSet implements Set {
      * Sorted list of integers, representing intervals
      */
     private LinkedList<Interval> intervals = new LinkedList<Interval>();
+    
+    /**
+     * True if the functions print messages in the shell for debugging, false otherwise.
+     */
+    private boolean verbose = false;
 
     /**
      * Constructor
@@ -21,10 +26,40 @@ public class IntervalSet implements Set {
     public IntervalSet(Interval interval) {
         this.intervals.add(interval);
     }
+    
+    public void enableVerbose() {
+    	verbose = true;
+    }
+    
+    public void disableVerbose() {
+    	verbose = false;
+    }
+    
+    public void printIntervals() {
+    	System.out.print("(");
+    	for(int i = first(); i < last(); i++) {
+    		System.out.print(intervals.get(i).toString()+" U ");
+    	}
+    	System.out.println(intervals.get(last()).toString()+")");
+    }
 
     /**************
      * ELEMENTARY *
      **************/
+    
+    /**
+     * Return first index of the list of intervals
+     */
+    private int first() {
+    	return 0;
+    }
+    
+    /**
+     * Return last index of the list of intervals
+     */
+    private int last() {
+    	return intervals.size()-1;
+    }
 
     /**
      * Remove the interval at the given index from the list intervals
@@ -35,31 +70,33 @@ public class IntervalSet implements Set {
 
     /**
      * Add the given interval at the specific index.
-     * An index equal to size() + 1 will result in adding at the end of the list.
+     * An index equal to size() will result in adding at the end of the list.
      * The interval must fit perfectly into the sorted list. Otherwise an exception is thrown.
      */
-    private void add_interval(int index_interval, Interval interval) { // O(list.add(i,e))
-
-        int nb_intervals = intervals.size();
+    private void add_interval(int index_insertion, Interval interval) { // O(list.add(i,e))
+    	
+    	if (verbose) {
+        	System.out.println("add_interval("+index_insertion+","+interval.toString()+")");
+    	}
 
         // assertions
-        if (index_interval < 0 || index_interval > nb_intervals + 1) {
+        if (index_insertion < first() || index_insertion > last()+1) {
             throw new IndexOutOfBoundsException("\n$ Index out of bound.");
-        } else if (index_interval == 0 && interval.top() >= intervals.get(0).bottom()) {
+        } else if (index_insertion == first() && interval.top() >= intervals.get(first()).bottom()) {
             throw new IllegalArgumentException("\n$ The new interval is covering an existing interval.");
-        } else if (index_interval == nb_intervals+1 && interval.bottom() <= intervals.get(nb_intervals).top()) {
+        } else if (index_insertion == last()+1 && interval.bottom() <= intervals.get(last()).top()) {
             throw new IllegalArgumentException("\n$ The new interval is covering an existing interval.");
-        } else if (index_interval > 0 && index_interval <= nb_intervals) {
-            if (interval.bottom() <= intervals.get(index_interval-1).top()) {
+        } else if (index_insertion > first() && index_insertion <= last()) {
+            if (interval.bottom() <= intervals.get(index_insertion-1).top()) {
                 throw new IllegalArgumentException("\n$ The new interval is covering an existing interval.");
-            } else if (interval.top() >= intervals.get(index_interval).bottom()) {
+            } else if (interval.top() >= intervals.get(index_insertion).bottom()) {
                 throw new IllegalArgumentException("\n$ The new interval is covering an existing interval.");
             }
         }
             
         // code
-        if (index_interval >= 0 && index_interval <= nb_intervals) {
-            intervals.add(index_interval,interval);
+        if (index_insertion >= first() && index_insertion <= last()) {
+            intervals.add(index_insertion,interval);
         } else {
             intervals.add(interval);
         }
@@ -70,30 +107,38 @@ public class IntervalSet implements Set {
      * The interval on the left is expanded, the one on the right is deleted.
      * Return true if the intervals have been merged, false otherwise.
      */
-    private boolean merge_intervals(int index_inter_left, int index_inter_right) { // O(list.remove(i))
-
+    private void merge_intervals(int index_inter_left, int index_inter_right) { // O(list.remove(i))
+    	
+    	if (verbose) {
+    		System.out.println("merge_intervals("+index_inter_left+","+index_inter_right+")");
+    	}
+    	
         if (index_inter_left + 1 != index_inter_right) {
             throw new IllegalArgumentException("\n$ The two intervals have to be consecutive.");
+        } else if (index_inter_left < first() || index_inter_right > last()) {
+        	throw new IndexOutOfBoundsException("\n$ Indicies out of bound.");
         }
 
         Interval inter_left = intervals.get(index_inter_left);
         Interval inter_right = intervals.get(index_inter_right);
 
-        if (inter_left.top() > inter_right.top() || inter_left.bottom() > inter_right.bottom()) {
+        if (inter_left.top() > inter_right.top() || inter_left.bottom() > inter_right.bottom()) { // this condition can be removed if we are sure that the list of intervals is sorted
             throw new IllegalArgumentException("\n$ The left interval should be on the left wrt the interval on the right.");
-        } else if (inter_left.top() < inter_right.bottom()) { // the intervals don't have to be merged
-            return false;
         } else { // the merge can be done
             inter_left.shift_top(inter_right.top()-inter_left.top()); // expand left interval
             remove_interval(index_inter_right);
         }
-        return true;
     }
 
     /**
      * Reduce the given interval, from the bottom or the top (depending of the given boolean parameter)
      */
     private void reduce_interval(int index_interval, boolean at_bottom) { // O(list.remove(i))
+    	
+    	if (verbose) {
+    		System.out.println("reduce_interval("+index_interval+","+at_bottom+")");
+    	}
+    	
         Interval interval = intervals.get(index_interval);
 
         if (interval.bottom() == interval.top()) { // the resulting interval is empty
@@ -109,10 +154,17 @@ public class IntervalSet implements Set {
      * Expand the given interval, from the bottom or the top (depending of the given boolean parameter)
      */
     private void expand_interval(int index_interval, boolean at_bottom) { // O(list.remove(i))
+    	
+    	if (verbose) {
+    		System.out.println("expand_interval("+index_interval+","+at_bottom+")");
+    	}
+    		
         Interval interval = intervals.get(index_interval);
 
-        if (at_bottom && intervals.get(index_interval-1).top() + 1 == interval.bottom()) {
+        if (at_bottom && index_interval > first() && intervals.get(index_interval-1).top() + 1 == interval.bottom()) {
             merge_intervals(index_interval-1,index_interval);
+        } else if (!at_bottom && index_interval < last() && intervals.get(index_interval+1).bottom() - 1 == interval.top()) {
+        	merge_intervals(index_interval,index_interval+1);
         } else if (at_bottom) {
             intervals.get(index_interval).shift_bottom(-1);
         } else {
@@ -122,16 +174,22 @@ public class IntervalSet implements Set {
 
     /**
      * Split the given interval to remove the given value from the set
+     * The split can only be done if the value is stricly inside the interval
      */
     private void split_interval(int index_interval, int deleted_value) { // O(list.add(i,e))
+    	
+    	if (verbose) {
+    		System.out.println("split_interval("+index_interval+","+deleted_value+")");
+    	}
+    	
         Interval interval = intervals.get(index_interval);
         
         if (deleted_value <= interval.bottom() || deleted_value >= interval.top()) {
             throw new IllegalArgumentException("\n$ The deleted value doesn't fit the given interval. The update can't be done.");
         } else {
             Interval right_inter = new Interval(deleted_value+1,interval.top()); // create the interval on the right
-            interval.shift_top(deleted_value-1); // ajust the interval one the left
-            intervals.add(index_interval+1,right_inter);
+            interval.shift_top(deleted_value - interval.top() - 1); // ajust the interval one the left
+            add_interval(index_interval+1,right_inter);
         }
     }
 
@@ -139,6 +197,11 @@ public class IntervalSet implements Set {
      * Update the list of intervals to remove a given value
      */
     private void update_interval(int index_interval, int deleted_value) { // max[ O(list.add(i,e)), O(list.remove(i)) ]
+    	
+    	if (verbose) {
+    		System.out.println("update_interval("+index_interval+","+deleted_value+")");
+    	}
+    	
         Interval interval = intervals.get(index_interval);
 
         if (!value_is_in_interval(deleted_value, interval)) {
@@ -153,24 +216,15 @@ public class IntervalSet implements Set {
     }
 
     /**
-     * True if the given value isn't contained by neither of the given intervals and is between them,
-     * false otherwise
-     * 
-     * (CURRENTLY NOT USED)
-     */
-    private boolean value_is_between_intervals(int value, Interval interval_left, Interval interval_right) { // O(1)
-        if (value > interval_left.top() && value < interval_right.bottom()) { // O(1)
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * True if the given value is contained by the given interval,
      * false otherwise
      */
     private boolean value_is_in_interval(int value, Interval interval){ // O(1)
+    	
+    	if (verbose) {
+    		System.out.println("value_is_in_interval("+value+","+interval.toString()+")");
+    	}
+    	
         if (value >= interval.bottom() && value <= interval.top()){
             return true;
         } else {
@@ -185,33 +239,44 @@ public class IntervalSet implements Set {
     /**
      * Dichotomic search to find the index of the interval containing the given value
      * Return a tuple (a,b) :
-     * if a == -2 and b == -1 then value is smaller than all the intervals in the set
-     * else if a == nb_int + 1 and b == nb_intervals + 2 then value is greater than all the intervals in the set
+     * if a == first()-2 and b == first() -1 then value is smaller than all the intervals in the set
+     * else if a == last() + 1 and b == last() + 2 then value is greater than all the intervals in the set
      * else if a+1 == b then value is between intervals of index a and b, therefore not in the set
      * else (a == b) then value is in the interval of index a, therefore in the set
+     * 
+     * WARNING : the result of this function shouldn't be used as it is.
+     * The functions below parses the result of the dichotomy and extract precise information.
+     * > value_below_intervals (indicator)
+     * > value_above_intervals (indicator)
+     * > value_between_intervals (indicator)
+     * > value_inside_interval (indicator)
+     * > index_interval_containing_value (indicator)
+     * > indicies_intervals_around_value (indicator)
      */
     private Interval indicies_intervals_containing(int value){ // O(log(nb_intervals))
-
-        int nb_intervals = intervals.size();
-
+    	
+    	if (verbose) {
+    		System.out.println("indicies_intervals_containing("+value+")");
+    	}
+    		
         // Check extreme cases
-        if (value < intervals.get(0).bottom()) { // value is inferior to the smallest interval
-            return new Interval(-2,-1);
-        } else if (value > intervals.get(nb_intervals).top()) { // value is superior to the greatest interval
-            return new Interval(nb_intervals+1,nb_intervals+2);
+        if (value < intervals.get(first()).bottom()) { // value is inferior to the smallest interval
+        	return new Interval(first()-2,first()-1);
+        } else if (value > intervals.get(last()).top()) { // value is superior to the greatest interval
+        	return new Interval(first()-4,first()-3);
         // Dichotomic search
         } else {
-            int start = 1;
-            int end = nb_intervals;
+            int start = first();
+            int end = last();
             int middle;
 
             while (start <= end) {
                 middle = (int) Math.floor( (double)(end+start) / 2 );
                 if (value_is_in_interval(value, intervals.get(middle))) { // value is in the middle interval
                     return new Interval(middle,middle);
-                } else if (middle > 1 && value <= intervals.get(middle-1).top()) { // value is maybe in an interval on the left
+                } else if (middle > first() && value <= intervals.get(middle-1).top()) { // value is maybe in an interval on the left
                     end = middle-1;
-                } else if (middle < nb_intervals && value >= intervals.get(middle+1).bottom()) { // value is maybe in an interval on the right
+                } else if (middle < last() && value >= intervals.get(middle+1).bottom()) { // value is maybe in an interval on the right
                     start = middle+1;
                 } else if (value < intervals.get(middle).bottom()) { // value is in no interval, but below middle.
                     return new Interval(middle-1,middle); // middle - 1 >= 0 because if not we would have stop in an earlier condition
@@ -219,8 +284,62 @@ public class IntervalSet implements Set {
                     return new Interval(middle,middle+1); // same idea but for middle + 1
                 }
             }
+            throw new RuntimeException("\n$ The dichotomy method is broken.");
         }
-        return new Interval(-2,-1);
+    }
+    
+    /*****************************************************************
+     * INTERFACE FUNCTIONS FOR EXTRACTING INFO FROM DICHOTOMY RESULT *
+     *****************************************************************/
+    
+    /**
+     * Return true is value is smaller than all values in the set
+     */
+    private boolean value_below_intervals(Interval indicator) {
+    	return indicator.bottom() == first() - 2;
+    }
+    
+    /**
+     * Return true is value is greater than all values in the set
+     */
+    private boolean value_above_intervals(Interval indicator) {
+    	return indicator.bottom() == first() - 4;
+    }
+    
+    /**
+     * Return true is value is between two intervals of the set
+     */
+    private boolean value_between_intervals(Interval indicator) {
+    	return indicator.bottom() + 1 == indicator.top();
+    }
+    
+    /**
+     * Return true is value is contained by an interval in the set
+     */
+    private boolean value_inside_interval(Interval indicator) {
+    	return indicator.bottom() == indicator.top();
+    }
+    
+    /**
+     * Return the index of the interval containing value
+     */
+    private int index_interval_containing_value(Interval indicator) {
+    	if (!value_inside_interval(indicator)) {
+    		throw new IllegalArgumentException("\n$ The value isn't contained by an interval.");
+    	} else {
+    		return indicator.bottom();
+    	}
+    }
+    
+    /**
+     * Return true is value is smaller than all values in the set
+     */
+    private Interval indicies_intervals_around_value(Interval indicator) {
+    	if (!value_between_intervals(indicator)) {
+    		throw new IllegalArgumentException("\n$ The value isn't between two intervals.");
+    	} else {
+    		return new Interval(indicator.bottom(),indicator.top());
+    	}
     }
 
     /********************
@@ -232,13 +351,17 @@ public class IntervalSet implements Set {
      * Return true if the list of intervals has been modified, false otherwise
      */
     public boolean remove(int value){ // max[ O(log(n)), O(list.add(i,e)), O(list.remove(i)) ]
-    	Interval indicies = indicies_intervals_containing(value); // O(log(nb_intervals))
-        int nb_intervals = intervals.size();
+    	
+    	if (verbose) {
+    		System.out.println("remove("+value+")");
+    	}
+    		
+    	Interval indicator = indicies_intervals_containing(value); // O(log(nb_intervals))
         
-        if (indicies.bottom() == -1 || (int) indicies.bottom() == nb_intervals+1 || indicies.bottom() != indicies.top()) { // value isn't contained by the set
+        if (!value_inside_interval(indicator)) { // value isn't contained by the set
             return false;
         } else { // value is in the set
-            update_interval((int) indicies.bottom(), value); // O(1)
+            update_interval(index_interval_containing_value(indicator), value); // O(1)
             return true;
         }
     }
@@ -248,27 +371,39 @@ public class IntervalSet implements Set {
      * Return true if the list of intervals has been modified, false otherwise
      */
     public boolean add(int value){ // max[ O(log(n)), O(list.add(i,e)), O(list.remove(i)) ]
-        Interval indicies = indicies_intervals_containing(value); // O(log(nb_intervals))
-        int nb_intervals = intervals.size();
+    	
+    	if (verbose) {
+    		System.out.println("add("+value+")");
+    	}
+
+		Interval indicator = indicies_intervals_containing(value); // O(log(nb_intervals))
         
-        if (indicies.bottom() == indicies.top()) { // value is already in an interval
+        if (value_inside_interval(indicator)) { // value is already in an interval
             return false;
-        } else if (indicies.bottom() == -2) { // value is smaller than all elements in the set
-            if (value + 1 == intervals.get(0).bottom()) { // the first interval will be expanded from the bottom
-                expand_interval(0, true);
+            
+        } else if (value_below_intervals(indicator)) { // value is smaller than all elements in the set
+            if (value + 1 == intervals.get(first()).bottom()) { // the first interval will be expanded from the bottom
+                expand_interval(first(), true);
             } else {
                 Interval new_interval = new Interval(value,value); // we have to create a new interval
-                add_interval(0, new_interval);
+                add_interval(first(), new_interval);
             }
-        } else if (indicies.bottom() == nb_intervals + 1) { // value is greater than all elements in the set
-            if (value - 1 == intervals.get(nb_intervals).top()) { // the last interval will be expanded from to top
-                expand_interval(nb_intervals, false);
+            
+        } else if (value_above_intervals(indicator)) { // value is greater than all elements in the set
+        	if (value - 1 == intervals.get(last()).top()) { // the last interval will be expanded from to top
+                expand_interval(last(), false);
             } else {
                 Interval new_interval = new Interval(value,value);
-                add_interval(nb_intervals+1, new_interval);
+                add_interval(last()+1, new_interval);
             }
-        } else { // value is between two intervals
-            if (value - 1 == intervals.get(indicies.bottom()).top()) { // left interval will be expanded
+        	
+        } else if (value_between_intervals(indicator)){ // value is between two intervals
+        	
+        	Interval indicies = indicies_intervals_around_value(indicator);
+        	
+        	if (value - 1 == intervals.get(indicies.bottom()).top() && value + 1 == intervals.get(indicies.top()).bottom()) { // two intervals have to be merged
+        		merge_intervals(indicies.bottom(),indicies.top());
+        	} else if (value - 1 == intervals.get(indicies.bottom()).top()) { // left interval will be expanded
                 expand_interval(indicies.bottom(), false);
             } else if (value + 1 == intervals.get(indicies.top()).bottom()) { // right interval will be expanded
                 expand_interval(indicies.top(), true);
@@ -276,7 +411,11 @@ public class IntervalSet implements Set {
                 Interval new_interval = new Interval(value,value);
                 add_interval(indicies.top(),new_interval);
             }
+        	
+        } else {
+        	throw new IllegalArgumentException("\n$ The indicator is broken.");
         }
+        
         return true;
     }
     
