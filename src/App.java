@@ -1,3 +1,7 @@
+package oroPPC;
+
+import java.util.LinkedList;
+
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
@@ -35,6 +39,21 @@ public class App {
 		System.out.println("mySet.remove(11);");
 		mySet.remove(11);
 		mySet.printIntervals();
+		
+		LinkedList<Interval> intervals = new LinkedList<Interval>();
+		intervals.add(new Interval(4,6));
+		intervals.add(new Interval(8,10));
+		intervals.add(new Interval(12,12));
+		IntervalSet E = new IntervalSet(intervals);
+		
+		System.out.println("\nE.printIntervals();");
+		E.printIntervals();
+		System.out.println("mySet.equals(E) = "+mySet.equals(E));
+		System.out.println("E.is_empty() = "+E.is_empty());
+		System.out.println("E.clear();");
+		E.clear();
+		E.printIntervals();
+		System.out.println("E.is_empty() = "+E.is_empty());
 	}
 
 }
