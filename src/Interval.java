@@ -44,6 +44,7 @@ public class Interval {
      * Shift the bottom frontier of the interval from delta
      */
     public void shift_bottom(int delta) {
+    	
         if (bottom + delta > top) {
             throw new IllegalArgumentException("\n$ delta = " + delta
 					+ ". Parameter 'delta' is too big, the bottom cannot be greater than the top of the interval.");
@@ -56,6 +57,7 @@ public class Interval {
      * Shift the top frontier of the interval from delta
      */
     public void shift_top(int delta) {
+    	
         if (bottom > top + delta) {
             throw new IllegalArgumentException("\n$ delta = " + delta
 					+ ". Parameter 'delta' is too big, the bottom cannot be greater than the top of the interval.");
@@ -70,6 +72,10 @@ public class Interval {
 
     public int top() {
         return top;
+    }
+    
+    public String toString() {
+    	return "["+bottom+", "+top+"]";
     }
 
 }
