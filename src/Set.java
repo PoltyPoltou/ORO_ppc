@@ -21,6 +21,11 @@ public interface Set {
      *         false otherwise
      */
     public boolean remove(int value);
+    
+    /**
+     * Return the complementary set to @this
+     */
+    public IntervalSet get_complementary();
 
     /**
      * @return True if the given integer is contained by the set,
@@ -48,7 +53,7 @@ public interface Set {
     /**
      * Remove from @this the elements not contained by the given set
      */
-    public void inter(Set set);
+    public boolean inter(Set set);
 
     /**
      * Add to @this the elements contained by the given set
