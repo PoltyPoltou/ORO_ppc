@@ -68,11 +68,23 @@ public class IntervalSet implements Set {
     private int last() {
     	return intervals.size()-1;
     }
+    
+    /**
+     * Value symbolizing inifinity. In short, this is a value that can't be inside a IntervalSet.
+     */
+    private int inf() {
+    	return Integer.MAX_VALUE;
+    }
 
     /**
      * Remove the interval at the given index from the list intervals
      */
     private void remove_interval(int index_interval) { // O(list.remove(i))
+    	
+    	if (verbose) {
+    		System.out.println("remove_interval("+index_interval+")");
+    	}
+    	
         intervals.remove(index_interval);
     }
 
@@ -248,7 +260,7 @@ public class IntervalSet implements Set {
      * Dichotomic search to find the index of the interval containing the given value
      * Return a tuple (a,b) :
      * if a == first()-2 and b == first() -1 then value is smaller than all the intervals in the set
-     * else if a == last() + 1 and b == last() + 2 then value is greater than all the intervals in the set
+     * else if a == first()-4 and b == first()-3 then value is greater than all the intervals in the set
      * else if a+1 == b then value is between intervals of index a and b, therefore not in the set
      * else (a == b) then value is in the interval of index a, therefore in the set
      * 
@@ -349,6 +361,43 @@ public class IntervalSet implements Set {
     		return new Interval(indicator.bottom(),indicator.top());
     	}
     }
+    
+    /**************************************
+     * PRIVATE FUNCTIONS FOR INTERSECTION *
+     **************************************/
+    
+    /**
+     * Remove the interval interval_to_remove from the interval of index intex_interval in the set
+     * Return true if the list of intervals has been modified
+     */
+    private boolean remove_interval_from(Interval interval_to_remove, int index_interval) {
+    	
+    	if (verbose) {
+    		System.out.println("remove_interval_from("+interval_to_remove.toString()+", "+index_interval+") from "+intervals.get(index_interval).toString());
+    	}
+    	
+    	if (index_interval < first() || index_interval > last()) {
+    		throw new IndexOutOfBoundsException("\n$ Index out of bound. index = "+index_interval+", first() = "+first()+", last() = "+last());
+    	}
+    	
+    	Interval interval = intervals.get(index_interval);
+    	
+    	if (interval.top() < interval_to_remove.bottom() || interval.bottom() > interval_to_remove.top()) { // no removal to do
+    		return false;
+    	} else if (interval.bottom() >= interval_to_remove.bottom() && interval.top() <= interval_to_remove.top()) { // interval is inside the interval to remove
+    		remove_interval(index_interval);
+    	} else if (interval.bottom() < interval_to_remove.bottom() && interval.top() > interval_to_remove.top()) { // interval to remove is stricly inside the interval
+    		Interval right_interval = new Interval(interval_to_remove.top()+1,interval.top());
+    		interval.shift_top(interval_to_remove.bottom() - interval.top() - 1);
+    		add_interval(index_interval+1,right_interval);
+    	} else if (interval.bottom() < interval_to_remove.bottom()) { // the top of the interval is over the interval to remove
+    		interval.shift_top(interval_to_remove.bottom() - interval.top() - 1);
+    	} else if (interval.top() > interval_to_remove.top()) { // the bottom of the interval is over the interval to remove
+    		interval.shift_bottom(interval_to_remove.top() - interval.bottom() + 1);
+    	}
+    	
+    	return true;
+    }
 
     /********************
      * PUBLIC FUNCTIONS *
@@ -428,14 +477,36 @@ public class IntervalSet implements Set {
     }
     
     /**
+     * Return the complementary set to @this
+     */
+    public IntervalSet complementary() {
+    	
+    	if (verbose) {
+    		System.out.println("complementary()");
+    	}
+    	
+    	if (is_empty()) {
+    		return new IntervalSet(new Interval(-inf(),inf()));
+    	}
+    	
+    	IntervalSet complem = new IntervalSet(new Interval(-inf(),intervals.get(first()).bottom()-1));
+    	
+    	for (int iter = first(); iter < last(); iter ++) {
+    		if (intervals.get(iter).top()+1 <= intervals.get(iter+1).bottom()-1) {
+    			complem.add_interval(complem.last()+1, new Interval(intervals.get(iter).top()+1,intervals.get(iter+1).bottom()-1));
+    		}
+    	}
+    	
+    	complem.add_interval(complem.last()+1, new Interval(intervals.get(last()).top()+1,inf()));
+    	
+    	return complem;
+    }
+    
+    /**
      * @return True if the given integer is contained by the set,
      *         false otherwise
      */
     public boolean contains(int value) {
-    	
-    	if (verbose) {
-    		System.out.println("contains("+value+")");
-    	}
     	
     	Interval indicator = indicies_intervals_containing(value);
 
@@ -448,10 +519,6 @@ public class IntervalSet implements Set {
      */
     public boolean equals(Set set) {
     	
-    	if (verbose) {
-    		System.out.println("equals("+set.toString()+")");
-    	}
-    	
     	return intervals.equals(set.get_intervals());
     }
     
@@ -461,10 +528,6 @@ public class IntervalSet implements Set {
      */
     public boolean is_empty() {
     	
-    	if (verbose) {
-    		System.out.println("is_empty()");
-    	}
-    	
     	return intervals.isEmpty();
     }
 
@@ -473,18 +536,81 @@ public class IntervalSet implements Set {
      */
     public void clear() {
     	
-    	if (verbose) {
-    		System.out.println("clear()");
-    	}
-    	
     	intervals.clear();
     }
 
     /**
      * Remove from @this the elements not contained by the given set
      */
-    public void inter(Set set) {
-    	// TODO
+    public boolean inter(Set set) {
+    	
+    	IntervalSet complem = set.complementary();
+    	LinkedList<Interval> complem_intervals = complem.get_intervals();
+    	
+    	// extreme cases
+    	if (is_empty() || complem.is_empty()) {
+    		clear();
+    	}
+    	
+    	int iter = first();
+    	int iter_complem = complem.first();
+    	
+    	boolean stop = false; // termination
+    	boolean result = false; // weither or not the list of intervals has been modified
+    	boolean removed = false; // for updating result
+    	int nb_intervals; // buffer for the number of intervals
+    	boolean smaller_list = false; // weither the iteration (remove_interval_from) has reduced the number of intervals
+    	
+    	while (!stop) {
+    		// initialization
+    		smaller_list = false;
+    		nb_intervals = last();
+    		
+    		// termination criteria
+    		if (iter > last() || iter_complem > complem.last()) {
+    			stop = true;
+    		
+    		// try removing
+    		} else {
+    			// filter
+    			removed = remove_interval_from(complem_intervals.get(iter_complem),iter);
+    			// if the list of intervals is smaller
+    			if (last() < nb_intervals) {
+    				smaller_list = true;
+    			}
+    			// update the result
+        		if (removed) {
+        			result = true;
+        		}
+        		// while we can reduce the number of intervals
+        		while (smaller_list && iter <= last()) {
+        			// init
+        			smaller_list = false;
+        			nb_intervals = last();
+        			// filter
+        			removed = remove_interval_from(complem_intervals.get(iter_complem),iter);
+        			if (last() < nb_intervals) {
+        				smaller_list = true;
+        			}
+        		}
+        		
+    			// update interators
+    			if ((iter_complem < complem.last() && iter < last())) { // we can move the two iterators
+    				if (intervals.get(iter+1).bottom() <= complem_intervals.get(iter_complem+1).bottom()) {
+						iter += 1;
+    				} else {
+    					iter_complem += 1;
+    				}
+    			} else if (iter_complem < complem.last()) {
+    				iter_complem += 1;
+    			} else if (iter < last()) {
+					iter += 1;
+    			} else {
+    				stop = true;
+    			}
+    		}
+    	}
+    	return result;
     }
 
     /**
