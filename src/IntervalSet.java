@@ -479,10 +479,10 @@ public class IntervalSet implements Set {
     /**
      * Return the complementary set to @this
      */
-    public IntervalSet complementary() {
+    public IntervalSet get_complementary() {
     	
     	if (verbose) {
-    		System.out.println("complementary()");
+    		System.out.println("get_complementary()");
     	}
     	
     	if (is_empty()) {
@@ -544,7 +544,7 @@ public class IntervalSet implements Set {
      */
     public boolean inter(Set set) {
     	
-    	IntervalSet complem = set.complementary();
+    	IntervalSet complem = set.get_complementary();
     	LinkedList<Interval> complem_intervals = complem.get_intervals();
     	
     	// extreme cases
