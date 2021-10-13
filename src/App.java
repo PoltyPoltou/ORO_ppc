@@ -1,3 +1,4 @@
+
 import java.util.LinkedList;
 
 /*
@@ -11,7 +12,18 @@ import java.util.LinkedList;
 public class App {
 
 	public static void main(String[] args) {
-		test_inter();
+		IntervalSet lb_A = new IntervalSet(new Interval(1,2));
+		IntervalSet ub_A = new IntervalSet(new Interval(1,6));
+		SetVariable A = new SetVariable(lb_A,ub_A,2,4);
+		
+		IntervalSet lb_B = new IntervalSet(new Interval(2,3));
+		IntervalSet ub_B = new IntervalSet(new Interval(2,7));
+		SetVariable B = new SetVariable(lb_B,ub_B,2,4);
+		
+		InterEmptyConstraint IEC = new InterEmptyConstraint(A,B);
+		
+		System.out.println(IEC.entailment());
+		System.out.println(IEC.failure());
 	}
 	
 	public static void demo_1() {
