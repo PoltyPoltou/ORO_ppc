@@ -1,9 +1,10 @@
-import java.util.LinkedList;
 
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
  */
+
+import java.util.LinkedList;
 
 /**
  * Interface for all set Sets
@@ -64,6 +65,11 @@ public interface Set {
      * Remove from @this the elements contained by the given set
      */
     public void deprived_of(Set set);
+    
+    /**
+     * Return the number of values in the set
+     */
+    public int size();
 
     /**
      * @return Returns the list of intervals of the set (for intervalSets only)
