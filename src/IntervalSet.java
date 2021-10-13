@@ -1,9 +1,10 @@
-import java.util.LinkedList;
 
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
  */
+
+import java.util.LinkedList;
 
 /**
  * Set made of integer intervals
@@ -29,6 +30,16 @@ public class IntervalSet implements Set {
     
     public IntervalSet(LinkedList<Interval> intervals) {
         this.intervals = intervals;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public IntervalSet(IntervalSet intervalSet) {
+    	this.intervals = (LinkedList<Interval>) intervalSet.intervals.clone();
+    }
+    
+    @SuppressWarnings("unchecked")
+	public IntervalSet clone() {
+    	return new IntervalSet((LinkedList<Interval>) intervals.clone());
     }
     
     public void enableVerbose() {
@@ -482,7 +493,7 @@ public class IntervalSet implements Set {
     public IntervalSet get_complementary() {
     	
     	if (verbose) {
-    		System.out.println("get_complementary()");
+    		System.out.println("complementary()");
     	}
     	
     	if (is_empty()) {
@@ -625,6 +636,19 @@ public class IntervalSet implements Set {
      */
     public void deprived_of(Set set) {
     	// TODO
+    }
+    
+    /**
+     * Return the number of values in the intervalSet
+     * 
+     * TODO : maintain an attribute storing the current size of the intervalSet to reduce computation costs
+     */
+    public int size() {
+    	int size_set = 0;
+    	for (int i = first(); i < last(); i ++ ) {
+    		size_set += intervals.get(i+1).top() - intervals.get(i).bottom();
+    	}
+    	return size_set;
     }
 
     /**
