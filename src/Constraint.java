@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
@@ -14,8 +15,6 @@ public interface Constraint {
      * @return true if the constraint is always satisfied
      */
     public boolean entailment();
-
-    public Collection<SetVariable> get_variables();
 
     /**
      * @return true if the constrant cannot be satisfied
@@ -37,4 +36,6 @@ public interface Constraint {
      */
     public void filter(List<SetVariable> var_list, List<Pair<Integer, Integer>> cardinality_list,
             List<List<Integer>> removal_list, List<List<Integer>> addition_list);
+   
+    public Collection<SetVariable> get_variables();
 }
