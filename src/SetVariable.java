@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2021, Nicolas Pierre, Eva Epoy, Jules Nicolas-Thouvenin. All rights reserved.
  *
@@ -17,8 +18,6 @@
  * is_valid will check if the variable cannot take any value
  */
 
-import java.util.TreeSet;
-
 /**
  * The object representing a set variable.
  */
@@ -27,12 +26,12 @@ public class SetVariable {
 	/**
 	 * The list of integers that <em>must</em> be in the set variable.
 	 */
-	private TreeSet<Integer> lower_bound;
+	private IntervalSet lower_bound;
 
 	/**
 	 * The list of integers that <em>might</em> be in the set variable.
 	 */
-	private TreeSet<Integer> upper_bound;
+	private IntervalSet upper_bound;
 
 	/**
 	 * The minimum number of integers in the set variable.
@@ -47,12 +46,12 @@ public class SetVariable {
 	/**
 	 * The initial list of integers that <em>must</em> be in the set variable.
 	 */
-	private TreeSet<Integer> default_lower_bound;
+	private IntervalSet default_lower_bound;
 
 	/**
 	 * The initial list of integers that <em>might</em> be in the set variable.
 	 */
-	private TreeSet<Integer> default_upper_bound;
+	private IntervalSet default_upper_bound;
 
 	/**
 	 * The initial minimum number of integers in the set variable.
@@ -77,11 +76,11 @@ public class SetVariable {
 	 * @param default_max_cardinality The maximum number of integers that might be
 	 *                                in the set variable
 	 */
-	public SetVariable(TreeSet<Integer> default_lower_bound, TreeSet<Integer> default_upper_bound,
+	public SetVariable(IntervalSet default_lower_bound, IntervalSet default_upper_bound,
 			int default_min_cardinality, int default_max_cardinality) {
 
-		this.lower_bound = new TreeSet<Integer>(default_lower_bound);
-		this.upper_bound = new TreeSet<Integer>(default_upper_bound);
+		this.lower_bound = new IntervalSet(default_lower_bound);
+		this.upper_bound = new IntervalSet(default_upper_bound);
 
 		this.min_cardinality = default_min_cardinality;
 		this.max_cardinality = default_max_cardinality;
@@ -198,9 +197,9 @@ public class SetVariable {
 			return false;
 		}
 		// Costly operation O(n*ln(n))
-		if (this.upper_bound.containsAll(this.lower_bound)) {
+		/*if (this.upper_bound.containsAll(this.lower_bound)) {
 			return false;
-		}
+		}*/
 		return true;
 	}
 
@@ -218,6 +217,22 @@ public class SetVariable {
 
 	public void set_max_cardinality(int max_cardinality) {
 		this.max_cardinality = max_cardinality;
+	}
+	
+	public IntervalSet get_lower_bound() {
+		return lower_bound;
+	}
+	
+	public IntervalSet get_default_lower_bound() {
+		return default_lower_bound;
+	}
+	
+	public IntervalSet get_upper_bound() {
+		return upper_bound;
+	}
+	
+	public IntervalSet get_default_upper_bound() {
+		return default_upper_bound;
 	}
 
 }
